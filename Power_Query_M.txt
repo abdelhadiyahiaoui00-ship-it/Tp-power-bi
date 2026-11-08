@@ -1,0 +1,50 @@
+// Power BI Desktop > Accueil > Transformer les données > Nouvelle source > Requête vide > Éditeur avancé.
+// Collez chaque bloc dans une requête portant le nom indiqué. Créez d'abord le paramètre texte `Dossier` (ex. C:\TP6\dataset\).
+
+// ===== DIM_CLINIQUE =====
+let
+  Source = Csv.Document(File.Contents(Dossier & "DIM_CLINIQUE_DATA_TABLE.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+  Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+  Encodage = Table.ReplaceValue(Entetes, "Ã¨", "è", Replacer.ReplaceText, {"NOM_CLINIQUE","VILLE","REGION"}),
+  Nettoyage = Table.TransformColumns(Encodage, {{"NOM_CLINIQUE", each Text.Proper(Text.Trim(_)), type text}, {"VILLE", each Text.Proper(Text.Trim(_)), type text}, {"REGION", each Text.Proper(Text.Trim(_)), type text}}),
+  SansDoublon = Table.Distinct(Nettoyage, {"NOM_CLINIQUE"}),
+  Pays = Table.AddColumn(SansDoublon, "PAYS", each "Algérie", type text),
+  Loc = Table.AddColumn(Pays, "LOCALISATION", each [VILLE] & ", Algérie", type text),
+  Types = Table.TransformColumnTypes(Loc, {{"ID_CLINIQUE", Int64.Type}})
+in Types
+
+// ===== DIM_AGE =====
+let
+  Source = Csv.Document(File.Contents(Dossier & "DIM_AGE_DATA_TABLE.csv"), [Delimiter=",", Encoding=65001]),
+  Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+  Valides = Table.SelectRows(Entetes, each List.Contains({"0-17","18-39","40-59","60+","Inconnu"}, [GROUPE_AGE])),
+  Types = Table.TransformColumnTypes(Valides, {{"ID_AGE", Int64.Type}, {"GROUPE_AGE", type text}})
+in Types
+
+// ===== DIM_TEMPS =====
+let
+  Source = Csv.Document(File.Contents(Dossier & "DIM_TEMPS_DATA_TABLE.csv"), [Delimiter=",", Encoding=65001]),
+  Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+  Types = Table.TransformColumnTypes(Entetes, {{"ID_TEMPS", Int64.Type}, {"MOIS", Int64.Type}, {"SEMESTRE", Int64.Type}, {"ANNEE", Int64.Type}})
+in Types
+
+// ===== DIM_ACTE =====
+let
+  Source = Csv.Document(File.Contents(Dossier & "DIM_ACTE_DATA_TABLE.csv"), [Delimiter=",", Encoding=65001]),
+  Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+  Types = Table.TransformColumnTypes(Entetes, {{"ID_ACTE", Int64.Type}, {"LIBELLE_ACTE", type text}, {"SPECIALITE", type text}, {"TARIF", Currency.Type}})
+in Types
+
+// ===== DIM_SEXE =====
+let
+  Source = Csv.Document(File.Contents(Dossier & "DIM_SEXE_DATA_TABLE.csv"), [Delimiter=",", Encoding=65001]),
+  Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+  Types = Table.TransformColumnTypes(Entetes, {{"ID_SEXE", Int64.Type}, {"SEXE", type text}})
+in Types
+
+// ===== FAIT_ACTIVITE =====
+let
+  Source = Csv.Document(File.Contents(Dossier & "FAIT_ACTIVITE_DATA_TABLE.csv"), [Delimiter=",", Encoding=65001]),
+  Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+  Types = Table.TransformColumnTypes(Entetes, {{"ID_TEMPS", Int64.Type}, {"ID_CLINIQUE", Int64.Type}, {"ID_ACTE", Int64.Type}, {"ID_SEXE", Int64.Type}, {"ID_AGE", Int64.Type}, {"NB_ACTES", Int64.Type}, {"MONTANT", Currency.Type}})
+in Types

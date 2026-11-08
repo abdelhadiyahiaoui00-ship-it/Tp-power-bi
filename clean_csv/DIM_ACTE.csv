@@ -1,0 +1,16 @@
+﻿ID_ACTE,LIBELLE_ACTE,SPECIALITE,TARIF
+1,Consultation generale,Medecine generale,1500
+2,Certificat medical,Medecine generale,800
+3,Consultation cardiologie,Cardiologie,3000
+4,Electrocardiogramme,Cardiologie,2000
+5,Echocardiographie,Cardiologie,6000
+6,Consultation pediatrie,Pediatrie,2000
+7,Vaccination,Pediatrie,1200
+8,Radiographie thorax,Radiologie,2500
+9,Echographie abdominale,Radiologie,4000
+10,Scanner,Radiologie,12000
+11,Consultation gynecologie,Gynecologie,3000
+12,Echographie obstetricale,Gynecologie,4500
+13,Bilan sanguin complet,Biologie,2800
+14,Glycemie,Biologie,400
+15,Bilan lipidique,Biologie,1600
